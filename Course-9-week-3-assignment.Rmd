@@ -1,0 +1,60 @@
+---
+title: "Course 9 Week 3 Assignment"
+author: "Kaushik Sivasankaran"
+date: "7/18/2021"
+output: ioslides_presentation
+---
+
+
+## Introduction
+
+- The goal of this project is to create a web page presentation using R Markdown that features a plot created using the *Plotly* package.
+
+- The plot itself will show a set of sub-plots highlighting the growth of Walmart stores in the United States from 1962 to 2006.
+
+
+## Walmart's Growth
+
+```{r library, echo=FALSE, include=FALSE}
+library(plotly)
+library(dplyr)
+
+```
+
+```{r load_data, echo = FALSE, include=FALSE}
+Walmart_data <- read.csv('https://raw.githubusercontent.com/plotly/datasets/master/1962_2006_walmart_store_openings.csv')
+
+```
+
+```{r plot, echo = FALSE, message=FALSE, warning=FALSE, fig.align='left'}
+
+# common map properties
+Prop <- list(
+  scope = 'usa',
+  showland = T,
+  landcolor = toRGB("gray90"),
+  showcountries = F,
+  subunitcolor = toRGB("white")
+)
+
+one_map <- function(dat) {
+  plot_geo(dat) %>%
+    add_markers(x = ~LON, y = ~LAT, color = I("blue"), alpha = 0.5) %>%
+    add_text(x = -78, y = 47, text = ~unique(YEAR), color = I("black")) %>%
+    layout(geo = Prop)}
+
+Walmart_data <- Walmart_data %>% group_by(YEAR)
+Walmart_data <- Walmart_data %>% do(mafig = one_map(.))
+fig <- Walmart_data %>% subplot(nrows = 9)
+fig <- fig %>% layout(
+  showlegend = FALSE,
+  title = 'New Walmart Stores per year 1962-2006 | Source: <a href="http://www.econ.umn.edu/~holmes/data/WalMart/index.html">University of Minnesota</a>',
+  width = 700,
+  height = 500,
+  hovermode = FALSE
+)
+
+fig
+```
+
+
